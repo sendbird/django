@@ -73,7 +73,7 @@ def adapt_datetime_with_timezone_support(value, conv):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
         value = value.astimezone(timezone.utc).replace(tzinfo=None)
-    return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S.%f"), conv)
+    return Thing2Literal(value.strftime("%Y-%m-%d %H:%M:%S"), conv)
 
 # MySQLdb-1.2.1 returns TIME columns as timedelta -- they are more like
 # timedelta in terms of actual behavior as they are signed and include days --
@@ -163,7 +163,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # types, as strings. Column-type strings can contain format strings; they'll
     # be interpolated against the values of Field.__dict__ before being output.
     # If a column type is set to None, it won't be included in the output.
-    _data_types = {
+    data_types = {
         'AutoField': 'integer AUTO_INCREMENT',
         'BinaryField': 'longblob',
         'BooleanField': 'bool',
@@ -190,13 +190,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         'TimeField': 'time',
         'UUIDField': 'char(32)',
     }
-
-    @cached_property
-    def data_types(self):
-        if self.features.supports_microsecond_precision:
-            return dict(self._data_types, DateTimeField='datetime(6)', TimeField='time(6)')
-        else:
-            return self._data_types
 
     operators = {
         'exact': '= %s',
