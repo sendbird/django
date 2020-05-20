@@ -19,6 +19,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     has_select_for_update = True
     has_select_for_update_nowait = False
     supports_forward_references = False
+    supports_microsecond_precision = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
     can_introspect_autofield = True
@@ -45,12 +46,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def can_introspect_foreign_keys(self):
         "Confirm support for introspected foreign keys"
         return self._mysql_storage_engine != 'MyISAM'
-
-    @cached_property
-    def supports_microsecond_precision(self):
-        # See https://github.com/farcepest/MySQLdb1/issues/24 for the reason
-        # about requiring MySQLdb 1.2.5
-        return self.connection.mysql_version >= (5, 6, 4) and Database.version_info >= (1, 2, 5)
 
     @cached_property
     def has_zoneinfo_database(self):
