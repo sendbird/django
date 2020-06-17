@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0007_alter_validators_add_error_messages'),
+        ('auth', '0006_alter_validators_add_error_messages'),
     ]
 
     operations = [
