@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('auth', '0006_require_contenttypes_0002'),
+        ('auth', '0005_require_contenttypes_0002'),
     ]
 
     operations = [
