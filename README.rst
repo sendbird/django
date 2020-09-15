@@ -61,3 +61,8 @@ This version does not exist.
 * Fixed Python 3.6 deprecation warning for empty model `super()` calls. (82036a5)
 * Reverted the upstream microsecond precision support (a20ce1a)
 * Suppressed the upstream update of nullable `User.last_login` (1cb5bc2)
+
+1.9.16
+======
+
+* Re-enabled the upstream microsecond precision support. (1b55425)
