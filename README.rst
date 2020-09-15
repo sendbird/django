@@ -41,3 +41,23 @@ To run Django's test suite:
 * Follow the instructions in the "Unit tests" section of
   docs/internals/contributing/writing-code/unit-tests.txt, published online at
   https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+
+*****************
+The SendBird Fork
+*****************
+
+1.9.13 is the last minor version of upstream Django 1.9.
+
+1.9.14
+======
+
+This version does not exist.
+
+1.9.15
+======
+
+`Soda <https://github.com/sendbird/soda>`_ uses this fork since v0.28. (See `sendbird/soda#6667 <https://github.com/sendbird/soda/pull/6667>`_)
+
+* Fixed Python 3.6 deprecation warning for empty model `super()` calls. (82036a5)
+* Reverted the upstream microsecond precision support (a20ce1a)
+* Suppressed the upstream update of nullable `User.last_login` (1cb5bc2)
