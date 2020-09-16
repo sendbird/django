@@ -65,4 +65,6 @@ This version does not exist.
 1.9.16
 ======
 
+`Soda <https://github.com/sendbird/soda>`_ uses this fork since v0.33. (See `sendbird/soda#7711 <https://github.com/sendbird/soda/pull/7711>`_)
+
 * Re-enabled the upstream microsecond precision support. (1b55425)
