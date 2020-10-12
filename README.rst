@@ -42,3 +42,16 @@ To run Django's test suite:
 * Follow the instructions in the "Unit tests" section of
   ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
   https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+
+*****************
+The SendBird Fork
+*****************
+
+2.2.16 is the last minor version of upstream Django 2.2.
+
+2.2.16
+======
+
+`Omni <https://github.com/sendbird/omni>`_ uses this fork since beginning of the proejct.
+
+* Fix str decoding error when using pymysql==0.10.1 as backend (c704458)
