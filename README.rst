@@ -68,3 +68,8 @@ This version does not exist.
 `Soda <https://github.com/sendbird/soda>`_ uses this fork since v0.33. (See `sendbird/soda#7711 <https://github.com/sendbird/soda/pull/7711>`_)
 
 * Re-enabled the upstream microsecond precision support. (1b55425)
+
+1.11.32
+=======
+
+* Only change from upstream is suppressing the upstream update of nullable `User.last_login` (1cb5bc2).
