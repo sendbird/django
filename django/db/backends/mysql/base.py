@@ -326,14 +326,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def mysql_server_info(self):
-        with self.temporary_connection() as cursor:
-            cursor.execute('SELECT VERSION()')
-            return cursor.fetchone()[0]
-
-    @cached_property
     def mysql_version(self):
-        match = server_version_re.match(self.mysql_server_info)
+        with self.temporary_connection():
+            server_info = self.connection.get_server_info()
+        match = server_version_re.match(server_info)
         if not match:
             raise Exception('Unable to determine MySQL version from version string %r' % self.mysql_server_info)
         return tuple(int(x) for x in match.groups())
