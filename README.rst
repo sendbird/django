@@ -73,3 +73,8 @@ This version does not exist.
 =======
 
 * Only change from upstream is suppressing the upstream update of nullable `User.last_login` (1cb5bc2).
+
+1.11.33
+=======
+
+* Revert MySQL version detection to not use `SELECT VERSION()`
