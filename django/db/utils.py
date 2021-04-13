@@ -150,6 +150,7 @@ class ConnectionHandler(object):
         """
         self._databases = databases
         self._connections = local()
+        self.connection_pool = {}
 
     @cached_property
     def databases(self):
@@ -203,14 +204,27 @@ class ConnectionHandler(object):
             test_settings.setdefault(key, None)
 
     def __getitem__(self, alias):
+        # reuse green-let local for conn inside a single request
         if hasattr(self._connections, alias):
             return getattr(self._connections, alias)
 
-        self.ensure_defaults(alias)
-        self.prepare_test_settings(alias)
-        db = self.databases[alias]
-        backend = load_backend(db['ENGINE'])
-        conn = backend.DatabaseWrapper(db, alias)
+        if alias not in self.connection_pool:
+            self.connection_pool[alias] = ConnectionPool()
+
+        pool = self.connection_pool[alias]
+        if len(pool.queue) > 0 or pool.outstanding == MAX_OUTSTANDING:
+            conn = pool.queue.get(timeout=TIMEOUT)
+            conn.close_if_unusable_or_obsolete()
+        else:
+            # create new instance of connection
+            self.ensure_defaults(alias)
+            self.prepare_test_settings(alias)
+            db = self.databases[alias]
+            backend = load_backend(db['ENGINE'])
+            conn = backend.DatabaseWrapper(db, alias)
+            # connection can be recycled by different green-lets
+            conn.allow_thread_sharing = True
+        pool.outstanding += 1
         setattr(self._connections, alias, conn)
         return conn
 
@@ -337,3 +351,23 @@ class ConnectionRouter(object):
         """
         models = app_config.get_models(include_auto_created=include_auto_created)
         return [model for model in models if self.allow_migrate_model(db, model)]
+
+
+from django.utils.six.moves import queue
+
+MAX_POOL_SIZE = 20
+MAX_OUTSTANDING = None
+TIMEOUT = None
+
+
+class ConnectionPool(object):
+    def __init__(self):
+        self.queue = queue.Queue()
+        self.outstanding = 0
+
+    def release(self, conn):
+        self.outstanding -= 1
+        if len(self.queue) < MAX_POOL_SIZE:
+            self.queue.put(conn)
+        else:
+            conn.close()
