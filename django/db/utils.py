@@ -355,7 +355,7 @@ class ConnectionRouter(object):
 
 from django.utils.six.moves import queue
 
-MAX_POOL_SIZE = 20
+MAX_POOL_SIZE = 200
 MAX_OUTSTANDING = None
 TIMEOUT = None
 
