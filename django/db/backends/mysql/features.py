@@ -45,7 +45,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def supports_microsecond_precision(self):
         # See https://github.com/farcepest/MySQLdb1/issues/24 for the reason
         # about requiring MySQLdb 1.2.5
-        return self.connection.mysql_version >= (5, 6, 4) and Database.version_info >= (1, 2, 5)
+        return Database.version_info >= (1, 2, 5)
 
     @cached_property
     def can_introspect_foreign_keys(self):
