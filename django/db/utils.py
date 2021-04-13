@@ -212,7 +212,7 @@ class ConnectionHandler(object):
             self.connection_pool[alias] = ConnectionPool()
 
         pool = self.connection_pool[alias]
-        if len(pool.queue) > 0 or pool.outstanding == MAX_OUTSTANDING:
+        if not pool.queue.empty() or pool.outstanding == MAX_OUTSTANDING:
             conn = pool.queue.get(timeout=TIMEOUT)
             conn.close_if_unusable_or_obsolete()
         else:
