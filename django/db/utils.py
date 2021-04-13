@@ -367,7 +367,7 @@ class ConnectionPool(object):
 
     def release(self, conn):
         self.outstanding -= 1
-        if len(self.queue) < MAX_POOL_SIZE:
+        if self.queue.qsize() < MAX_POOL_SIZE:
             self.queue.put(conn)
         else:
             conn.close()
