@@ -71,7 +71,7 @@ def recycle_old_connections(**kwargs):
     for alias in connections:
         aliases.append(alias)
         conn = connections[alias]
-        ConnectionHandler.connection_pool[alias].release(conn)
+        connections.connection_pool[alias].release(conn)
 
     for alias in aliases:
         del connections[alias]      # unbind conn from green-let local
