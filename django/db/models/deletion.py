@@ -130,9 +130,12 @@ class Collector(object):
         """
         if from_field and from_field.remote_field.on_delete is not CASCADE:
             return False
-        if not (hasattr(objs, 'model') and hasattr(objs, '_raw_delete')):
+        if hasattr(objs, '_meta'):
+            model = type(objs)
+        elif hasattr(objs, 'model') and hasattr(objs, '_raw_delete'):
+            model = objs.model
+        else:
             return False
-        model = objs.model
         if (signals.pre_delete.has_listeners(model) or
                 signals.post_delete.has_listeners(model) or
                 signals.m2m_changed.has_listeners(model)):
@@ -147,7 +150,7 @@ class Collector(object):
         for related in get_candidate_relations_to_delete(opts):
             if related.field.remote_field.on_delete is not DO_NOTHING:
                 return False
-        for field in model._meta.private_fields:
+        for field in opts.private_fields:
             if hasattr(field, 'bulk_related_objects'):
                 # It's something like generic foreign key.
                 return False
@@ -270,6 +273,14 @@ class Collector(object):
         self.sort()
         # number of objects deleted for each model label
         deleted_counter = Counter()
+
+        # Optimize for the case with a single obj and no dependencies
+        if len(self.data) == 1 and len(instances) == 1:
+            instance = list(instances)[0]
+            if self.can_fast_delete(instance):
+                with transaction.mark_for_rollback_on_error(using=self.using):
+                    count = sql.DeleteQuery(model).delete_batch([instance.pk], self.using)
+                return count, {model._meta.label: count}
 
         with transaction.atomic(using=self.using, savepoint=False):
             # send pre_delete signals

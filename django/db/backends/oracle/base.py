@@ -11,6 +11,7 @@ import os
 import platform
 import sys
 import warnings
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -62,6 +63,23 @@ from .operations import DatabaseOperations                  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor                    # NOQA isort:skip
 from .utils import Oracle_datetime                          # NOQA isort:skip
 
+
+@contextmanager
+def wrap_oracle_errors():
+    try:
+        yield
+    except Database.DatabaseError as e:
+        # cx_Oracle raises a cx_Oracle.DatabaseError exception with the
+        # following attributes and values:
+        #  code = 2091
+        #  message = 'ORA-02091: transaction rolled back
+        #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
+        #               _C00102056) violated - parent key not found'
+        # Convert that case to Django's IntegrityError exception.
+        x = e.args[0]
+        if hasattr(x, 'code') and hasattr(x, 'message') and x.code == 2091 and 'ORA-02291' in x.message:
+            raise utils.IntegrityError(*tuple(e.args))
+        raise
 
 class _UninitializedOperatorsDescriptor(object):
 
@@ -256,21 +274,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _commit(self):
         if self.connection is not None:
-            try:
+            with wrap_oracle_errors():
                 return self.connection.commit()
-            except Database.DatabaseError as e:
-                # cx_Oracle raises a cx_Oracle.DatabaseError exception
-                # with the following attributes and values:
-                #  code = 2091
-                #  message = 'ORA-02091: transaction rolled back
-                #            'ORA-02291: integrity constraint (TEST_DJANGOTEST.SYS
-                #               _C00102056) violated - parent key not found'
-                # We convert that particular case to our IntegrityError exception
-                x = e.args[0]
-                if hasattr(x, 'code') and hasattr(x, 'message') \
-                   and x.code == 2091 and 'ORA-02291' in x.message:
-                    six.reraise(utils.IntegrityError, utils.IntegrityError(*tuple(e.args)), sys.exc_info()[2])
-                raise
 
     # Oracle doesn't support releasing savepoints. But we fake them when query
     # logging is enabled to keep query counts consistent with other backends.
@@ -494,7 +499,8 @@ class FormatStylePlaceholderCursor(object):
     def execute(self, query, params=None):
         query, params = self._fix_for_params(query, params, unify_by_values=True)
         self._guess_input_sizes([params])
-        return self.cursor.execute(query, self._param_generator(params))
+        with wrap_oracle_errors():
+            return self.cursor.execute(query, self._param_generator(params))
 
     def executemany(self, query, params=None):
         if not params:
@@ -507,7 +513,8 @@ class FormatStylePlaceholderCursor(object):
         # more than once, we can't make it lazy by using a generator
         formatted = [firstparams] + [self._format_params(p) for p in params_iter]
         self._guess_input_sizes(formatted)
-        return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
+        with wrap_oracle_errors():
+            return self.cursor.executemany(query, [self._param_generator(p) for p in formatted])
 
     def fetchone(self):
         row = self.cursor.fetchone()

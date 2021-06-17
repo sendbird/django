@@ -1,6 +1,7 @@
 from django.db.backends.oracle.base import (
     DatabaseWrapper as OracleDatabaseWrapper,
 )
+from contextlib import contextmanager
 
 from .features import DatabaseFeatures
 from .introspection import OracleIntrospection
