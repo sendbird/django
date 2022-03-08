@@ -14,7 +14,7 @@ class PostgresConfig(AppConfig):
 
     def ready(self):
         # Connections may already exist before we are called.
-        for conn in connections.all():
+        for conn in connections.all(initialized_only=True):
             if conn.connection is not None:
                 register_type_handlers(conn)
         connection_created.connect(register_type_handlers)
