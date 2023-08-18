@@ -178,6 +178,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE
                 kc.table_schema = DATABASE() AND
                 kc.table_name = %s
+            ORDER BY
+                kc.ordinal_position
         """
         cursor.execute(name_query, [table_name])
         for constraint, column, ref_table, ref_column in cursor.fetchall():
