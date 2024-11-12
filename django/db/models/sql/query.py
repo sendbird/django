@@ -8,7 +8,13 @@ all about the internals of models in order to get the information it needs.
 """
 import copy
 import warnings
-from collections import Counter, Iterator, Mapping, OrderedDict
+from collections import Counter, OrderedDict
+try:
+    from collections.abc import Iterable
+    from collections.abc import MutableMapping
+except ImportError:
+    from collections import Iterable
+    from collections import MutableMapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 

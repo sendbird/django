@@ -121,9 +121,12 @@ class Paginator(object):
 
 
 QuerySetPaginator = Paginator   # For backwards-compatibility.
+try:
+    from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
 
-
-class Page(collections.Sequence):
+class Page(Sequence):
 
     def __init__(self, object_list, number, paginator):
         self.object_list = object_list
