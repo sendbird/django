@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
-import collections
+try:
+    from collections.abc import Iterable
+except ImportError:
+    from collections import Iterable
 import datetime
 import decimal
 import functools
@@ -384,7 +387,7 @@ def serializer_factory(value):
         return FunctoolsPartialSerializer(value)
     if isinstance(value, (types.FunctionType, types.BuiltinFunctionType, types.MethodType)):
         return FunctionTypeSerializer(value)
-    if isinstance(value, collections.Iterable):
+    if isinstance(value, Iterable):
         return IterableSerializer(value)
     if isinstance(value, (COMPILED_REGEX_TYPE, RegexObject)):
         return RegexSerializer(value)
