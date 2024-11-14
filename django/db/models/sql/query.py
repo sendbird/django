@@ -11,10 +11,10 @@ import warnings
 from collections import Counter, OrderedDict
 try:
     from collections.abc import Iterator
-    from collections.abc import MutableMapping
+    from collections.abc import MutableMapping, Mapping
 except ImportError:
     from collections import Iterator
-    from collections import MutableMapping
+    from collections import MutableMapping, Mapping
 from itertools import chain, count, product
 from string import ascii_uppercase
 
