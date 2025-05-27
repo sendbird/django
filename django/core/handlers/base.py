@@ -108,9 +108,9 @@ class BaseHandler(object):
 
     def make_view_atomic(self, view):
         non_atomic_requests = getattr(view, '_non_atomic_requests', set())
-        for db in connections.all():
-            if db.settings_dict['ATOMIC_REQUESTS'] and db.alias not in non_atomic_requests:
-                view = transaction.atomic(using=db.alias)(view)
+        for alias, settings_dict in connections.databases.items():
+            if settings_dict.get('ATOMIC_REQUESTS', False) and alias not in non_atomic_requests:
+                view = transaction.atomic(using=alias)(view)
         return view
 
     def get_exception_response(self, request, resolver, status_code, exception):
