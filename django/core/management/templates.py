@@ -1,4 +1,3 @@
-import cgi
 import errno
 import io
 import mimetypes
@@ -17,6 +16,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.management.utils import handle_extensions
 from django.template import Context, Engine
 from django.utils import archive, six
+from django.utils.cgi import parse_header
 from django.utils.six.moves.urllib.request import urlretrieve
 from django.utils.version import get_docs_version
 
@@ -267,7 +267,7 @@ class TemplateCommand(BaseCommand):
         # Trying to get better name from response headers
         content_disposition = info.get('content-disposition')
         if content_disposition:
-            _, params = cgi.parse_header(content_disposition)
+            _, params = parse_header(content_disposition)
             guessed_filename = params.get('filename') or used_name
         else:
             guessed_filename = used_name

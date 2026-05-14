@@ -212,6 +212,9 @@ failure and get a correct traceback.
     def addSuccess(self, test):
         self.events.append(('addSuccess', self.test_index))
 
+    def addDuration(self, test, elapsed):
+        self.events.append(('addDuration', self.test_index, elapsed))
+
     def addSkip(self, test, reason):
         self.events.append(('addSkip', self.test_index, reason))
 

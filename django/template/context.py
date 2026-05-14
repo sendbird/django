@@ -38,7 +38,8 @@ class BaseContext(object):
             self.dicts.append(value)
 
     def __copy__(self):
-        duplicate = copy(super(BaseContext, self))
+        duplicate = self.__class__.__new__(self.__class__)
+        duplicate.__dict__ = self.__dict__.copy()
         duplicate.dicts = self.dicts[:]
         return duplicate
 

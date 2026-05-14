@@ -8,7 +8,6 @@ from __future__ import unicode_literals
 
 import base64
 import binascii
-import cgi
 import sys
 
 from django.conf import settings
@@ -19,6 +18,7 @@ from django.core.files.uploadhandler import (
     SkipFile, StopFutureHandlers, StopUpload,
 )
 from django.utils import six
+from django.utils.cgi import valid_boundary
 from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_text
 from django.utils.six.moves.urllib.parse import unquote
@@ -74,7 +74,7 @@ class MultiPartParser(object):
         # Parse the header to get the boundary to split the parts.
         ctypes, opts = parse_header(content_type.encode('ascii'))
         boundary = opts.get('boundary')
-        if not boundary or not cgi.valid_boundary(boundary):
+        if not boundary or not valid_boundary(boundary):
             raise MultiPartParserError('Invalid boundary in multipart: %s' % boundary)
 
         # Content-Length should contain the length of the body we are about

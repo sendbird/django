@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import cgi
 import codecs
 import re
 from io import BytesIO
@@ -11,6 +10,7 @@ from django.core import signals
 from django.core.handlers import base
 from django.urls import set_script_prefix
 from django.utils import six
+from django.utils.cgi import parse_header
 from django.utils.encoding import (
     force_str, force_text, repercent_broken_unicode,
 )
@@ -95,7 +95,7 @@ class WSGIRequest(http.HttpRequest):
         self.META['PATH_INFO'] = path_info
         self.META['SCRIPT_NAME'] = script_name
         self.method = environ['REQUEST_METHOD'].upper()
-        self.content_type, self.content_params = cgi.parse_header(environ.get('CONTENT_TYPE', ''))
+        self.content_type, self.content_params = parse_header(environ.get('CONTENT_TYPE', ''))
         if 'charset' in self.content_params:
             try:
                 codecs.lookup(self.content_params['charset'])
